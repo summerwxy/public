@@ -14,7 +14,7 @@ import hashlib
 import re
 
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 URL_SCRIPT = "https://raw.githubusercontent.com/summerwxy/public/refs/heads/main/d2r_my_name.py"
 
@@ -44,7 +44,7 @@ def check_update():
         script_path = os.path.abspath(sys.argv[0])
         with open(script_path, "w", encoding="utf-8") as f:
           f.write(remote_code)
-        print("✅ 更新完成，請重新執行本程式。")
+        input("✅ 更新完成，請重新執行本程式。")
         sys.exit(0)
     else:
       print(f"目前已是最新版本 {__version__}。")
@@ -72,7 +72,7 @@ def main():
   elif 'va' in py_file:
     the_path = va_path
   else:
-    print("蛤? 改一下檔案名稱才知道誰在執行的")
+    input("不知道誰的電腦, 改檔案名字之後, 重新執行本檔案...")
     sys.exit()
 
 
@@ -152,5 +152,6 @@ def main():
 if __name__ == "__main__":
   print("檢查版本...")
   check_update()
+  print("")
   print("程式繼續執行...")
   main()
