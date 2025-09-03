@@ -11,14 +11,48 @@ import requests
 import os
 import sys
 import hashlib
+import re
 
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
-URL_SCRIPT = ""
+URL_SCRIPT = "https://raw.githubusercontent.com/summerwxy/public/refs/heads/main/d2r_my_name.py"
 
+def get_remote_version_and_code():
+  """下載遠端腳本，取出版本號和完整內容"""
+  resp = requests.get(URL_SCRIPT, timeout=5)
+  resp.raise_for_status()
+  code = resp.text
+
+  # 用正則找 __version__ 定義
+  match = re.search(r'__version__\s*=\s*["\'](.+?)["\']', code)
+  remote_version = match.group(1) if match else None
+  return remote_version, code
+
+def check_update():
+  """檢查更新並自動覆蓋"""
+  try:
+    remote_version, remote_code = get_remote_version_and_code()
+    if not remote_version:
+      print("⚠️ 無法取得遠端版本號，略過更新檢查。")
+      return
+
+    if remote_version != __version__:
+      print(f"🔔 發現新版本 {remote_version} (目前 {__version__})")
+      choice = input("要更新嗎？(y/n): ").strip().lower()
+      if choice == "y":
+        script_path = os.path.abspath(sys.argv[0])
+        with open(script_path, "w", encoding="utf-8") as f:
+          f.write(remote_code)
+        print("✅ 更新完成，請重新執行本程式。")
+        sys.exit(0)
+    else:
+      print(f"目前已是最新版本 {__version__}。")
+  except Exception as e:
+    print("⚠️ 檢查更新失敗：", e)
 
 def main():
+  print("")
   print("== 檔案名稱裡面有包含 wxy 就是找 小幃電腦的安裝路徑==")
   print("== 檔案名稱裡面有包含 ssd 就是找 黑狗電腦的安裝路徑==")
   print("== 檔案名稱裡面有包含 va 就是找 口水電腦的安裝路徑==")
@@ -116,4 +150,7 @@ def main():
 
 
 if __name__ == "__main__":
+  print("檢查版本...")
+  check_update()
+  print("程式繼續執行...")
   main()
